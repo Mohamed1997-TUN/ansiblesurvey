@@ -12,15 +12,20 @@
         path: "{{ file_loc }}"
       register: file_stat
 
-    - name: Show the file status
+    - name: Show file status
       debug:
-        msg: "File {{ file_loc }} exists: {{ file_stat.stat.exists }}"
+        msg: "File exists: {{ file_stat.stat.exists }}"
 
     - name: call the template with our survey info
       template:
         src: survey-template.conf.j2
         dest: "{{ file_loc }}"
-      when: file_stat.stat.exists == false  # Only run this if the file doesn't exist
+        force: yes
+      when: file_stat.stat.exists == false
+
+    - name: Verify contents after template processing
+      debug:
+        msg: "The generated file content is: {{ lookup('file', file_loc) }}"
 
     - name: set file contents to variable
       set_fact:
