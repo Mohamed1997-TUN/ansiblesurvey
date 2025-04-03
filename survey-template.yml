@@ -3,9 +3,10 @@
   hosts: localhost
   gather_facts: false
   become: true
-  vars_files:
-    - /home/dhia/Desktop/awxsurvey/vars.yml
-
+  vars:
+    serv_name: your_service_name
+    option1: value1
+    option2: value2
   tasks:
     - name: Vérifier la présence des variables
       debug:
