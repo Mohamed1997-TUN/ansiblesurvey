@@ -4,45 +4,43 @@
   gather_facts: false
   become: true
   vars_files:
-    - /home/dhia/Desktop/awxsurvey/vars.yml  # External variables file if you want to use it
-
-  vars:
-    # Define your variables here, or keep them in vars.yml
-    file_loc: "/home/dhia/Desktop/awxsurvey/survey-template.conf"
-    result_loc: "/home/dhia/Desktop/awxsurvey/survey-result.conf"
-    serv_name: "my_service"
-    option1: "value1"
-    option2: "value2"
+    - /home/dhia/Desktop/awxsurvey/vars.yml  # Ensure the path to vars.yml is correct
 
   tasks:
+    # Debug task to check if the variables are loaded correctly
     - name: Vérifier la présence des variables
       debug:
         msg: "serv_name={{ serv_name }}, option1={{ option1 }}, option2={{ option2 }}"
 
+    # Create the directory if it doesn't exist
     - name: Créer le dossier si inexistant
       ansible.builtin.file:
         path: /home/dhia/Desktop/awxsurvey
         state: directory
         mode: '0755'
 
+    # Copy the template using the provided file path
     - name: Copier le template
       template:
         src: survey-template.conf.j2
-        dest: "{{ file_loc }}"
+        dest: "{{ file_loc }}"  # Use the file_loc variable from vars.yml
         force: yes
 
+    # Read the content of the generated file into a variable
     - name: Afficher le contenu généré
       set_fact:
-        file_con: "{{ lookup('file', file_loc) }}"
+        file_con: "{{ lookup('file', file_loc) }}"  # Use the file_loc variable from vars.yml
 
+    # Debug task to show the generated content
     - name: Debug the file content
       debug:
         var: file_con
 
+    # Save the result to a specified file
     - name: Sauvegarder le résultat dans un fichier de résultat
       copy:
         content: "{{ file_con }}"
-        dest: "{{ result_loc }}"
+        dest: "{{ result_loc }}"  # Use the result_loc variable from vars.yml
         mode: '0644'
         owner: dhia
         group: dhia
