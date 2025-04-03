@@ -3,15 +3,38 @@
   hosts: localhost
   gather_facts: false
   become: true
-  vars:
-    serv_name: your_service_name
-    option1: value1
-    option2: value2
-  
   vars_files:
-  - /home/dhia/Desktop/awxsurvey/vars.yml
-  
+    - /home/dhia/Desktop/awxsurvey/vars.yml
+
   tasks:
     - name: Vérifier la présence des variables
       debug:
         msg: "serv_name={{ serv_name }}, option1={{ option1 }}, option2={{ option2 }}"
+
+    - name: Créer le dossier si inexistant
+      ansible.builtin.file:
+        path: /home/dhia/Desktop/awxsurvey
+        state: directory
+        mode: '0755'
+
+    - name: Copier le template
+      template:
+        src: survey-template.conf.j2
+        dest: "{{ file_loc }}"
+        force: yes
+
+    - name: Afficher le contenu généré
+      set_fact:
+        file_con: "{{ lookup('file', file_loc) }}"
+
+    - name: Debug file to screen
+      debug:
+        var: file_con
+
+    - name: Sauvegarder le résultat dans un fichier de résultat
+      copy:
+        content: "{{ file_con }}"
+        dest: "/home/dhia/Desktop/awxsurvey/survey-result.conf"
+        mode: '0644'
+        owner: dhia
+        group: dhia
