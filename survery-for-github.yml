@@ -1,0 +1,31 @@
+---
+- name: demonstrate using surveys with templates
+  hosts: localhost
+  gather_facts: false
+  become: true
+  vars:
+    file_loc: /home/dhia/Desktop/awxsurvey/survey-template.conf
+
+  tasks:
+    - name: Check if the file path exists
+      stat:
+        path: "{{ file_loc }}"
+      register: file_stat
+
+    - name: Show the file status
+      debug:
+        msg: "File {{ file_loc }} exists: {{ file_stat.stat.exists }}"
+
+    - name: call the template with our survey info
+      template:
+        src: survey-template.conf.j2
+        dest: "{{ file_loc }}"
+      when: file_stat.stat.exists == false  # Only run this if the file doesn't exist
+
+    - name: set file contents to variable
+      set_fact:
+        file_con: "{{ lookup('file', file_loc) }}"
+
+    - name: debug file to screen
+      debug:
+        var: file_con
