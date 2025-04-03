@@ -4,28 +4,20 @@
   gather_facts: false
   become: true
   vars:
-    file_loc: /home/dhia/Desktop/awxsurvey/survey-template.conf
+    file_loc: /home/dhia/Desktop/jinja2test/survey-template.conf
 
   tasks:
-    - name: Check if the file path exists
-      stat:
-        path: "{{ file_loc }}"
-      register: file_stat
-
-    - name: Show file status
-      debug:
-        msg: "File exists: {{ file_stat.stat.exists }}"
+    - name: Créer le dossier si inexistant
+      ansible.builtin.file:
+        path: /home/dhia/Desktop/jinja2test
+        state: directory
+        mode: '0755'
 
     - name: call the template with our survey info
       template:
         src: survey-template.conf.j2
         dest: "{{ file_loc }}"
         force: yes
-      when: file_stat.stat.exists == false
-
-    - name: Verify contents after template processing
-      debug:
-        msg: "The generated file content is: {{ lookup('file', file_loc) }}"
 
     - name: set file contents to variable
       set_fact:
